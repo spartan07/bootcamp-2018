@@ -1,0 +1,94 @@
+---
+title: "R Day 2"
+author: "Arpan"
+date: "9/18/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+gapminder <- read.csv(here::here("data",'gapminder5.csv'))
+```
+
+## Convert factors to characters
+
+```{r}
+gapminder$country=as.character(gapminder$country)
+gapminder$continent=as.character(gapminder$continent)
+```
+
+##Caclulate GDP and Log transform variables
+```{r}
+for (i in 1:nrow(gapminder)){
+# gapminder[i,'GDP']=gapminder[i,'pop']*gapminder[i,'gdpPercap']  
+ gapminder[i,'log_gdpPercap']=log(gapminder[i,'gdpPercap'])
+ gapminder[i,'log_pop']=log(gapminder[i,'pop'])
+}
+```
+
+##Life Expwctancy by Continent
+
+```{r}
+aggregate(lifeExp~continent,data=gapminder,mean)
+
+for (i in unique(gapminder$continent)){
+  mean_le=mean(gapminder$lifeExp[gapminder$continent==i], na.rm=T)
+  print(paste0(i,':',mean_le))
+}
+```
+
+##Nested loops
+
+```{r}
+for (i in unique(gapminder$continent)){
+print(paste0('Continent:',i))
+    for (j in unique(gapminder$year)){
+    dev_le=sd(gapminder$lifeExp[gapminder$continent==i & gapminder$year==j],na.rm=T)
+    print(paste0('Year:',j,':,',dev_le))
+  }
+}
+```
+##While Loop
+```{r}
+i=1987
+while(i<=2002){
+  sdev=sd(gapminder$lifeExp[gapminder$year==i],na.rm=T)
+  print(paste0('Year',i,' : ',sdev))
+  i=i+5
+}
+```
+
+##For loop with if/else
+
+```{r}
+for ( i in unique(gapminder$year)){
+  if (i>=1987){
+    print(paste0('Mean population of ',i,' is  :',mean(gapminder$pop[gapminder$year==i])))
+  }
+  else{
+    print(paste0('Sorry year',i,' is less than 1987'))
+  }
+}
+
+```
+
+##Function
+
+```{r}
+my_func=function(df,x,y){
+  mn=mean(df[[x]][df$continent==y])
+  md=median(df[[x]][df$continent==y])
+  minn=min(df[[x]][df$continent==y])
+  maxx=max(df[[x]][df$continent==y])
+  cat('Continent ' ,y,
+      '\nmEDIAN',md,
+      '\nmin',minn)
+  
+}
+my_func(gapminder,'lifeExp','Asia')
+```
+
+
