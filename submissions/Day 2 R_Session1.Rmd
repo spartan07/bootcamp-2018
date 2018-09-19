@@ -1,0 +1,79 @@
+---
+title: "Day 3"
+author: "Arpan"
+date: "9/19/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Read Files
+```{r}
+generation=read.csv('data/generation.csv',stringsAsFactors = FALSE)
+imports=read.csv('data/imports.csv',stringsAsFactors = F)
+```
+
+##Understand data
+```{r}
+str(generation)
+```
+
+##Date-time conversion
+```{r}
+library(lubridate)
+generation$datetime = as_datetime(generation$datetime)
+imports$datetime = as_datetime(imports$datetime)
+```
+##Merging Data
+```{r}
+merged=merge(generation,imports,by='datetime')
+str(merged)
+
+```
+
+##Reshaping Merged Data
+```{r}
+library(reshape2)
+long_merged=melt(merged,id.vars='datetime',variable.name='source',value.name='Usage')
+```
+
+
+
+##Dplyr
+```{r}
+library(dplyr)
+#Select, Filter, Mutate, Summarize
+temp=filter(select(merged,datetime,biogas,biomass),biogas>235)
+#Piping
+merged %>%
+select(biogas) %>%
+mutate(log_usage=log(biogas)) %>%
+summarize(answer=mean(log_usage,na.rm=T))  
+
+```
+##Dplyr Example
+```{r}
+merged %>%
+  select(contains("hydro")) %>%
+  mutate(total_hydro=rowSums(.,na.rm=T))%>%
+  summarize(mean_Value=mean(total_hydro,na.rm=T))
+
+```
+##Dplyr Example 2
+```{r}
+merged %>%
+  select(datetime,contains("hydro"),biogas,biomass)%>%
+  melt(id.vars="datetime",variable.name="Source",value.name = "Usage")%>%
+  group_by(Source)%>%
+  summarize(mean_usage=mean(Usage,na.rm=T))
+```
+
+
+
+
+
+
+
+

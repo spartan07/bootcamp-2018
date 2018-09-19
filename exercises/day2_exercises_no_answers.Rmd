@@ -39,6 +39,8 @@ Hint: use the `any` function.
 
 ```{asis}
 ### Answer
+any(gapmider$year==2002)
+any(gapmider$year==2002)
 ```
 
 ```{r}
@@ -117,9 +119,18 @@ data_frame_info(gapminder)
 
 Create a function that given a vector will print the mean and the standard deviation of a **vector**, it will optionally also print the median. Hint: include an argument that takes a boolean (`TRUE`/`FALSE`) operator and then include an `if` statement.
 
-```{asis}
+```{r}
 ### Answer
-
+my_func=function(x,print_med=F){
+  mn=mean(x)
+  sdev=sd(x)
+  md=median(x)
+  cat('Mean is',mn,'\nStd.dev:',sdev)
+  if (print_med==T){
+    print(paste0('Median',md))
+  }
+}
+my_func(gapminder$pop,T)
 ```
 
 ```{r}
